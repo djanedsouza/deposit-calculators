@@ -1,0 +1,379 @@
+<html>
+  <head>
+    <title>Loan Calculator</title>
+
+    <style>
+      :root {
+        --bg-light: #f5f1f0;
+        --error: red;
+        --bg-dark: #d4cace;
+        --text-dark: #828282;
+        --accent-color: #92278f;
+        --white: white;
+        --black: black;
+        --font-28: 1.75rem;
+        --font-24: 1.5rem;
+        --font-20: 1.25rem;
+        --font-16: 1rem;
+        --font-14: 0.875rem;
+        --font-12: 0.75rem;
+        --font-10: 0.625rem;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: Arial, Helvetica, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      label,
+      .range-text,
+      #maturity {
+        display: block;
+        font-size: var(--font-12);
+        color: var(--text-dark);
+        padding: 10px 0;
+      }
+
+      .calculator-header-container {
+        padding: 10px;
+        text-align: center;
+      }
+
+      .calculator-container {
+        border-radius: 10px;
+        background-color: var(--bg-light);
+        width: 500px;
+        padding: 20px;
+      }
+
+      .error-text {
+        display: none;
+        color: red;
+        font-size: var(--font-12);
+        padding-top: 10px;
+      }
+
+      .error-field {
+        border: 1px solid red;
+        outline: 1px solid red;
+      }
+
+      .info-text {
+        color: var(--text-dark);
+        font-size: var(--font-10);
+      }
+
+      .input-field {
+        /* outline: var(--bg-dark); */
+        font-size: var(--font-16);
+        /* color: var(--bg-dark); */
+        padding: 10px;
+        border-radius: 8px;
+        width: 100%;
+      }
+
+      .input-field-normal {
+        border: 1px solid var(--bg-dark);
+        outline: 1px solid var(--bg-dark);
+      }
+
+      input[type="text"]:focus {
+        /* outline: var(--accent-color); */
+        border: 1px solid var(--accent-color);
+        outline: 1px solid var(--accent-color);
+      }
+
+      input[type="range"] {
+        accent-color: var(--accent-color);
+        width: 100%;
+      }
+
+      select {
+        width: 100%;
+        outline: var(--bg-dark);
+        border: var(--bg-dark);
+        padding: 10px;
+        border-radius: 8px;
+        background: var(--bg-dark);
+        font-size: var(--font-16);
+        cursor: pointer;
+      }
+
+      #durationText,
+      .interest-text {
+        font-size: var(--font-16);
+      }
+
+      #calculateBtn {
+        padding: 10px;
+        border: none;
+        outline: none;
+        background: var(--accent-color);
+        color: var(--white);
+        font-size: var(--font-16);
+        border-radius: 8px;
+        cursor: pointer;
+        margin-top: 10px;
+      }
+
+      .maturity-text {
+        color: var(--black);
+        font-size: var(--font-16);
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="calculator-body-container">
+      <div class="calculator-header-container">
+        <h2>Calculate your Maturity</h2>
+      </div>
+      <div class="calculator-container">
+        <div class="container-left">
+          <form action="javascript: void(0)" autocomplete="off">
+            <label for="applicantName"> Applicant Name </label>
+            <input
+              type="text"
+              name="applicantName"
+              id="applicantName"
+              placeholder="Type your name..."
+              class="input-field input-field-normal"
+              onkeydown="validateName()"
+            />
+            <p id="nameError" class="error-text"></p>
+            <br />
+
+            <label for="amount"> Principle amount</label>
+            <!-- <input type="number" name="duration" id="duration" required /> -->
+            <p id="amountText"></p>
+            <input
+              type="range"
+              id="amount"
+              name="amount"
+              onchange="setRangeTexts('amount')"
+            />
+            <p
+              id="lowerAmountRangeText"
+              class="range-text"
+              style="float: left"
+            ></p>
+            <p
+              id="higherAmountRangeText"
+              class="range-text"
+              style="float: right"
+            ></p>
+
+            <div style="clear: both"></div>
+            <br />
+
+            <label for="interest">
+              Rate of Interest <span class="info-text">(* This is fixed)</span>
+            </label>
+            <!-- <input type="text" id="interest" name="interest" readonly required disabled />% -->
+            <p class="interest-text">
+              <span id="interest" name="interest"></span>%
+            </p>
+
+            <br />
+
+            <label for="duration"> Loan tenure</label>
+            <!-- <input type="number" name="duration" id="duration" required /> -->
+            <p id="durationText"></p>
+            <input
+              type="range"
+              id="duration"
+              name="duration"
+              onchange="setRangeTexts('duration')"
+            />
+            <p
+              id="lowerDurationRangeText"
+              class="range-text"
+              style="float: left"
+            >
+              1 year
+            </p>
+            <p
+              id="higherDurationRangeText"
+              class="range-text"
+              style="float: right"
+            >
+              5 years
+            </p>
+            <br />
+
+            <!-- <label for="emi"> EMI </label>
+            <input type="text" name="emi" id="emi" readonly /> -->
+
+            <div style="clear: both"></div>
+
+            <button onclick="validateDetails()" id="calculateBtn">
+              CALCULATE
+            </button>
+
+            <br />
+
+            <p id="maturity"></p>
+          </form>
+        </div>
+        <div class="container-right"></div>
+      </div>
+    </div>
+
+    <!-- <h2>EMI CALCULATOR</h2>
+
+    <form action="javascript: void(0)">
+      <label for="applicantName"> Applicant Name </label>
+      <input type="text" name="applicantName" id="applicantName" required />
+
+      <br />
+
+      <label for="loanType"> Loan Type </label>
+      <select id="loanType" required>
+        <option value="">Select</option>
+        <option value="home">Home</option>
+        <option value="car">Car</option>
+        <option value="personal">Personal</option>
+      </select>
+
+      <br />
+
+      <label for="amount"> Amount </label>
+      <input type="number" id="amount" name="amount" required />
+
+      <br />
+
+      <label for="interest"> Interest </label>
+      <input type="text" id="interest" name="interest" readonly required />%
+
+      <br />
+
+      <label for="duration"> Duration (in years) </label>
+      <input type="number" name="duration" id="duration" required />
+
+      <br />
+
+      <label for="emi"> EMI </label>
+      <input type="text" name="emi" id="emi" readonly />
+
+      <br />
+
+      <button onclick="validateDetails()">CALCULATE</button>
+      <input type="reset" value="CLEAR ALL" />
+    </form> -->
+
+    <script>
+      var maturityDetails = {
+        minAmount: 10000,
+        maxAmount: 10000000,
+        amountMultiples: 10000,
+        interest: 7,
+        minDurationInYears: 1,
+        maxDurationInYears: 5,
+      };
+
+      var rupeeUnicode = "\u20B9";
+      const applicantNameElement = document.getElementById("applicantName");
+
+      const amountElement = document.getElementById("amount");
+      const amountTextElement = document.getElementById("amountText");
+      const lowerAmountRangeTextElement = document.getElementById(
+        "lowerAmountRangeText"
+      );
+      const higherAmountRangeTextElement = document.getElementById(
+        "higherAmountRangeText"
+      );
+
+      const interestElement = document.getElementById("interest");
+
+      const durationElement = document.getElementById("duration");
+      const durationTextElement = document.getElementById("durationText");
+      const lowerDurationRangeTextElement = document.getElementById(
+        "lowerDurationRangeText"
+      );
+      const higherDurationRangeTextElement = document.getElementById(
+        "higherDurationRangeText"
+      );
+
+      const maturityElement = document.getElementById("maturity");
+
+      setInitialDetails();
+
+      function setInitialDetails() {
+        amountElement.min = maturityDetails.minAmount;
+        amountElement.max = maturityDetails.maxAmount;
+        amountElement.step = maturityDetails.minAmount;
+        lowerAmountRangeTextElement.textContent = `${rupeeUnicode}${addCommas(Number(maturityDetails.minAmount))}`;
+        higherAmountRangeTextElement.textContent = `${rupeeUnicode}${addCommas(Number(maturityDetails.maxAmount))}`;
+
+        interestElement.textContent = maturityDetails.interest;
+
+        durationElement.min = maturityDetails.minDurationInYears;
+        durationElement.max = maturityDetails.maxDurationInYears;
+        lowerDurationRangeTextElement.textContent =
+          maturityDetails.minDurationInYears + " year";
+        higherDurationRangeTextElement.textContent =
+          maturityDetails.maxDurationInYears + " years";
+        setRangeTexts("amount");
+        setRangeTexts("duration");
+      }
+
+      function setRangeTexts(ele) {
+        if (ele === "amount") {
+          amountTextElement.textContent = `${rupeeUnicode}${addCommas(Number(amountElement.value))}`;
+        } else if (ele === "duration") {
+          durationTextElement.textContent = durationElement.value + " year(s)";
+        }
+      }
+      function addCommas(number) {
+        return number.toLocaleString();
+      }
+
+      function validateDetails() {
+        let flag1 = validateName();
+        if (flag1) {
+          calculateMaturity();
+        }
+      }
+
+      function validateName() {
+        const nameErrorTextElement = document.getElementById("nameError");
+        if (applicantNameElement.value === "") {
+          applicantNameElement.classList.remove("input-field-normal");
+          applicantNameElement.classList.add("error-field");
+          nameErrorTextElement.style.display = "block";
+          nameErrorTextElement.textContent = "Please enter applicant name!";
+          return false;
+        } else {
+          applicantNameElement.classList.add("input-field-normal");
+          applicantNameElement.classList.remove("error-field");
+          nameErrorTextElement.textContent = "";
+          nameErrorTextElement.style.display = "none";
+          return true;
+        }
+      }
+
+      function calculateMaturity() {
+        console.log(getNumberFromAmount(amountElement.value))
+        let enteredAmount = parseInt(getNumberFromAmount(amountElement.value));
+        let enteredDuration = parseInt(durationElement.value);
+        let enteredInterest = maturityDetails.interest;
+
+        let interest_rate = enteredInterest / 100;
+
+        let value_r = 1 + interest_rate;
+        let maturity_amount = (enteredAmount * Math.pow(value_r, enteredDuration)).toFixed(2);
+
+        maturityElement.innerHTML = `Your maturity amount will be <span class="maturity-text">${rupeeUnicode}${maturity_amount}</span>`;
+      }
+
+      function getNumberFromAmount(str) {
+        return str.replace(/,/g, "");
+      }
+    </script>
+  </body>
+</html>

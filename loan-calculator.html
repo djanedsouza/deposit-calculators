@@ -1,0 +1,408 @@
+<html>
+  <head>
+    <title>Loan Calculator</title>
+
+    <style>
+      :root {
+        --bg-light: #f5f1f0;
+        --error: red;
+        --bg-dark: #d4cace;
+        --text-dark: #828282;
+        --accent-color: #92278f;
+        --white: white;
+        --black: black;
+        --font-28: 1.75rem;
+        --font-24: 1.5rem;
+        --font-20: 1.25rem;
+        --font-16: 1rem;
+        --font-14: 0.875rem;
+        --font-12: 0.75rem;
+        --font-10: 0.625rem;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: Arial, Helvetica, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      label,
+      #lowerDurationRangeText,
+      #higherDurationRangeText,
+      #emi {
+        display: block;
+        font-size: var(--font-12);
+        color: var(--text-dark);
+        padding: 10px 0;
+      }
+
+      .calculator-header-container {
+        padding: 10px;
+        text-align: center;
+      }
+
+      .calculator-container {
+        border-radius: 10px;
+        background-color: var(--bg-light);
+        width: 500px;
+        padding: 20px;
+      }
+
+      .error-text {
+        display: none;
+        color: red;
+        font-size: var(--font-12);
+        padding-top: 10px;
+      }
+
+      .error-field {
+        border: 1px solid red;
+        outline: 1px solid red;
+      }
+
+      .info-text {
+        color: var(--text-dark);
+        font-size: var(--font-10);
+      }
+
+      .input-field {
+        /* outline: var(--bg-dark); */
+        font-size: var(--font-16);
+        /* color: var(--bg-dark); */
+        padding: 10px;
+        border-radius: 8px;
+        width: 100%;
+      }
+
+      .input-field-normal {
+        border: 1px solid var(--bg-dark);
+        outline: 1px solid var(--bg-dark);
+
+      }
+
+      input[type="text"]:focus {
+        /* outline: var(--accent-color); */
+        border: 1px solid var(--accent-color);
+        outline: 1px solid var(--accent-color);
+      }
+
+      input[type="range"] {
+        accent-color: var(--accent-color);
+        width: 100%;
+      }
+
+      select {
+        width: 100%;
+        outline: var(--bg-dark);
+        border: var(--bg-dark);
+        padding: 10px;
+        border-radius: 8px;
+        background: var(--bg-dark);
+        font-size: var(--font-16);
+        cursor: pointer;
+      }
+
+      #durationText,
+      .interest-text {
+        font-size: var(--font-16);
+      }
+
+      #calculateBtn {
+        padding: 10px;
+        border: none;
+        outline: none;
+        background: var(--accent-color);
+        color: var(--white);
+        font-size: var(--font-16);
+        border-radius: 8px;
+        cursor: pointer;
+        margin-top: 10px;
+      }
+
+      .emi-text {
+        color: var(--black);
+        font-size: var(--font-16);
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="calculator-body-container">
+      <div class="calculator-header-container">
+        <h2>Calculate your EMI</h2>
+      </div>
+      <div class="calculator-container">
+        <div class="container-left">
+          <form action="javascript: void(0)" autocomplete="off">
+            <label for="applicantName"> Applicant Name </label>
+            <input
+              type="text"
+              name="applicantName"
+              id="applicantName"
+              placeholder="Type your name..."
+              class="input-field input-field-normal"
+              onkeydown="validateName()"
+            />
+            <p id="nameError" class="error-text"></p>
+            <br />
+
+            <label for="loanType"> Loan Type </label>
+            <select id="loanType" required>
+              <option value="home">Home</option>
+              <option value="car">Car</option>
+              <option value="personal">Personal</option>
+            </select>
+
+            <br />
+
+            <label for="amount"> Loan Amount <span class="info-text">(* Multiples of 10000)</span></label>
+            <input
+              type="text"
+              id="amount"
+              name="amount"
+              placeholder="Enter loan amount..."
+              class="input-field input-field-normal"
+              onkeydown="validateAmount()"
+            />
+            <p id="amountError" class="error-text"></p>
+
+            <br />
+
+            <label for="interest">
+              Rate of Interest <span class="info-text">(* This is fixed)</span>
+            </label>
+            <!-- <input type="text" id="interest" name="interest" readonly required disabled />% -->
+            <p class="interest-text"><span id="interest" name="interest"></span>%</p>
+
+            <br />
+
+            <label for="duration"> Loan tenure</label>
+            <!-- <input type="number" name="duration" id="duration" required /> -->
+            <p id="durationText"></p>
+            <input
+              type="range"
+              id="duration"
+              name="duration"
+              min="1"
+              step="1"
+              value="1"
+              onchange="setRangeTexts()"
+            />
+            <p id="lowerDurationRangeText" style="float: left">1 year</p>
+            <p id="higherDurationRangeText" style="float: right"></p>
+            <br />
+
+            <!-- <label for="emi"> EMI </label>
+            <input type="text" name="emi" id="emi" readonly /> -->
+
+            <div style="clear:both;"></div>
+
+            <button onclick="validateDetails()" id="calculateBtn">
+              CALCULATE
+            </button>
+
+            <br />
+
+            <p id="emi"></p>
+          </form>
+        </div>
+        <div class="container-right"></div>
+      </div>
+    </div>
+
+    <!-- <h2>EMI CALCULATOR</h2>
+
+    <form action="javascript: void(0)">
+      <label for="applicantName"> Applicant Name </label>
+      <input type="text" name="applicantName" id="applicantName" required />
+
+      <br />
+
+      <label for="loanType"> Loan Type </label>
+      <select id="loanType" required>
+        <option value="">Select</option>
+        <option value="home">Home</option>
+        <option value="car">Car</option>
+        <option value="personal">Personal</option>
+      </select>
+
+      <br />
+
+      <label for="amount"> Amount </label>
+      <input type="number" id="amount" name="amount" required />
+
+      <br />
+
+      <label for="interest"> Interest </label>
+      <input type="text" id="interest" name="interest" readonly required />%
+
+      <br />
+
+      <label for="duration"> Duration (in years) </label>
+      <input type="number" name="duration" id="duration" required />
+
+      <br />
+
+      <label for="emi"> EMI </label>
+      <input type="text" name="emi" id="emi" readonly />
+
+      <br />
+
+      <button onclick="validateDetails()">CALCULATE</button>
+      <input type="reset" value="CLEAR ALL" />
+    </form> -->
+
+    <script>
+      var loanDetails = [
+        {
+          loanType: "home",
+          minAmount: 100000,
+          interest: 8,
+          maxDuration: 25,
+        },
+        {
+          loanType: "car",
+          minAmount: 50000,
+          interest: 9,
+          maxDuration: 7,
+        },
+        {
+          loanType: "personal",
+          minAmount: 10000,
+          interest: 12,
+          maxDuration: 5,
+        },
+      ];
+
+      var loanTypeDetails = loanDetails[0];
+
+      const applicantNameElement = document.getElementById("applicantName");
+      const loanTypeElement = document.getElementById("loanType");
+      const amountElement = document.getElementById("amount");
+      const interestElement = document.getElementById("interest");
+      const durationElement = document.getElementById("duration");
+      const emiElement = document.getElementById("emi");
+      const durationTextElement = document.getElementById("durationText");
+      const higherDurationRangeTextElement = document.getElementById("higherDurationRangeText")
+
+      loanTypeElement.addEventListener("change", function (e) {
+        setLoanDetails(e);
+      });
+
+      amountElement.addEventListener("keydown", function (e) {
+        console.log(e)
+        if((e.key >= 0 && e.key <= 9) || e.key === "Backspace" || e.key === "Tab") {
+          return true;
+        } else {
+          e.preventDefault();
+          return false;
+        }
+      }); 
+
+      setLoanDetails(null);
+
+      function setLoanDetails(e) {
+        if (e && e.target.value) {
+          loanTypeDetails = loanDetails.filter(
+            (ele) => ele.loanType === e.target.value
+          )[0];
+        }
+
+        interestElement.textContent = loanTypeDetails.interest;
+
+        durationElement.value = 1;
+        durationElement.max = loanTypeDetails.maxDuration;
+        durationTextElement.textContent = durationElement.value + " year(s)";
+        higherDurationRangeTextElement.textContent = loanTypeDetails.maxDuration + " years";
+
+        emiElement.textContent = "";
+      }
+
+      function setRangeTexts() {
+        durationTextElement.textContent = durationElement.value + " year(s)";
+        
+      }
+
+      function validateDetails() {
+        let flag1 = validateName();
+        let flag2 = validateAmount();
+        if (flag1 && flag2) {
+          calculateEmi();
+        }
+      }
+
+      function validateName() {
+        const nameErrorTextElement = document.getElementById("nameError");
+        if(applicantNameElement.value === "") {
+          applicantNameElement.classList.remove("input-field-normal");
+          applicantNameElement.classList.add("error-field");
+          nameErrorTextElement.style.display = "block";
+          nameErrorTextElement.textContent = "Please enter applicant name!";
+          return false;
+        } else {
+          applicantNameElement.classList.add("input-field-normal");
+          applicantNameElement.classList.remove("error-field");
+          nameErrorTextElement.textContent = "";
+          nameErrorTextElement.style.display = "none";
+          return true;
+        }
+      }
+
+      function validateAmount() {
+        let amt = parseInt(amountElement.value);
+        const amountErrorTextElement = document.getElementById("amountError");
+        let amtInUnits = 10000;
+        let errorMsgs = [];
+        if (amountElement.value === "") {
+          // alert("Minimum amount should be " + loanTypeDetails.minAmount);
+          errorMsgs.push("Minimum amount should be " + loanTypeDetails.minAmount);
+          // return false;
+        } 
+        if (amountElement.value !== "" && amt % 10000 !== 0) {
+          // alert("Amount should be in multiples of " + amtInUnits);
+          errorMsgs.push("Amount should be in multiples of " + amtInUnits);
+          // return false;
+        }
+
+        if(errorMsgs.length) {
+          amountElement.classList.remove("input-field-normal");
+          amountElement.classList.add("error-field");
+          amountErrorTextElement.style.display = "block";
+          amountErrorTextElement.textContent = errorMsgs.join(" ");
+          return false;
+
+        } else {
+          amountElement.classList.add("input-field-normal");
+          amountElement.classList.remove("error-field");
+          amountErrorTextElement.style.display = "none";
+          amountErrorTextElement.textContent = "";
+          return true;
+
+        }
+
+        return true;
+      }
+
+      function calculateEmi() {
+        let enteredAmount = parseInt(amountElement.value);
+        let enteredDuration = parseInt(durationElement.value);
+        // let enteredInterest = parseInt(interestElement.value);
+        let enteredInterest = loanTypeDetails.interest;
+
+        let monthly_interest_rate = enteredInterest / (12 * 100);
+        let value_r = Math.pow(1 + monthly_interest_rate, enteredDuration * 12);
+
+        let emi_value = (
+          (enteredAmount * monthly_interest_rate * value_r) /
+          (value_r - 1)
+        ).toFixed(2);
+
+        emiElement.innerHTML = `You will have to pay <span class="emi-text">&#8377;  ${emi_value} </span> / month`;
+      }
+    </script>
+  </body>
+</html>
